@@ -18,30 +18,30 @@ export function selectUnit(
   from: Date | number,
   to: Date | number = Date.now(),
   thresholds: Partial<Thresholds> = {}
-): {value: number; unit: Unit} {
+): { value: number; unit: Unit } {
   const resolvedThresholds: Thresholds = {
     ...DEFAULT_THRESHOLDS,
-    ...(thresholds || {}),
+    ...(thresholds || {})
   };
   const secs = (+from - +to) / MS_PER_SECOND;
   if (Math.abs(secs) < resolvedThresholds.second) {
     return {
       value: Math.round(secs),
-      unit: 'second',
+      unit: 'second'
     };
   }
   const mins = secs / SECS_PER_MIN;
   if (Math.abs(mins) < resolvedThresholds.minute) {
     return {
       value: Math.round(mins),
-      unit: 'minute',
+      unit: 'minute'
     };
   }
   const hours = secs / SECS_PER_HOUR;
   if (Math.abs(hours) < resolvedThresholds.hour) {
     return {
       value: Math.round(hours),
-      unit: 'hour',
+      unit: 'hour'
     };
   }
 
@@ -49,40 +49,54 @@ export function selectUnit(
   if (Math.abs(days) < resolvedThresholds.day) {
     return {
       value: Math.round(days),
-      unit: 'day',
+      unit: 'day'
     };
   }
+
+  const weeks = secs / SECS_PER_WEEK;
+
+  if (
+    Math.round(Math.abs(weeks)) > 0 &&
+    Math.abs(weeks) < resolvedThresholds.week
+  ) {
+    return {
+      value: Math.round(weeks),
+      unit: 'week'
+    };
+  }
+
   const fromDate = new Date(from);
   const toDate = new Date(to);
 
   const years = fromDate.getFullYear() - toDate.getFullYear();
-  if (Math.round(Math.abs(years)) > 0) {
-    return {
-      value: Math.round(years),
-      unit: 'year',
-    };
-  }
 
   const months = years * 12 + fromDate.getMonth() - toDate.getMonth();
-  if (Math.round(Math.abs(months)) > 0) {
+  if (
+    Math.round(Math.abs(months)) > 0 &&
+    Math.abs(months) < resolvedThresholds.month
+  ) {
     return {
       value: Math.round(months),
-      unit: 'month',
+      unit: 'month'
     };
   }
-  const weeks = secs / SECS_PER_WEEK;
 
   return {
-    value: Math.round(weeks),
-    unit: 'week',
+    value: Math.round(years),
+    unit: 'year'
   };
 }
 
-type Thresholds = Record<'second' | 'minute' | 'hour' | 'day', number>;
+type Thresholds = Record<
+  'second' | 'minute' | 'hour' | 'day' | 'week' | 'month',
+  number
+>;
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
   second: 45, // seconds to minute
   minute: 45, // minutes to hour
   hour: 22, // hour to day
-  day: 5, // day to week
+  day: 6, // day to week
+  week: 3, // week to month
+  month: 11 // month to year
 };
