@@ -97,6 +97,6 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   minute: 45, // minutes to hour
   hour: 22, // hour to day
   day: 6, // day to week
-  week: 3, // week to month
-  month: 11 // month to year
+  week: 4, // week to month
+  month: 12 // month to year
 };
